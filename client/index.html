@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebSocket demo</title>
+
+    <style>
+        :root {
+            --col-width: 50px;
+            --row-height: 50px;
+        }
+
+        main {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: var(--col-width);
+        }
+
+        .el {
+            border: 1px solid black;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <!-- <div class="row">
+            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <p draggable="true" ondragstart="drag(event)" id="A">A</p>
+            </div>
+            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div> -->
+    </main>
+
+    <script src="board.js"></script>
+    <script src="element.js"></script>
+    <script>
+        let board = new Board(5, 5);
+        board.generateHTML();
+        let el = new Element(0, 0, "abc");
+        board.addElement(el);
+    </script>
+    <script src="drag.js"></script>
+</body>
+
+</html>
