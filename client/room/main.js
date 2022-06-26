@@ -22,7 +22,9 @@ ws.onmessage = function (e) {
             updateId(data["id"]);
             break;
         case "users":
-            updateUsers(data["users"]);
+            break;
+        case "names":
+            updateNames(data["names"]);
             break;
     }
 }
@@ -31,10 +33,20 @@ ws.onclose = function (e) {
     ws.send(JSON.stringify({ "action": "closeServer" }))
 }
 
-function updateUsers(users) {
-    document.querySelector("#users").innerText = users;
+function updateId(id) {
+    serverId = id;
+    document.querySelector("#id").innerText = id;
 }
 
-function updateId(id) {
-    document.querySelector("#id").innerText = id;
+function updateNames(names) {
+    let nameList = document.querySelector("#names");
+    nameList.innerHTML = ""
+    for (let name of names) {
+        nameList.innerHTML += `<li>${name}</li>`;
+    }
+}
+
+function updateName() {
+    let name = document.querySelector("#name").value;
+    ws.send(JSON.stringify({ "action": "updateName", "serverId": serverId, "name": name }));
 }
