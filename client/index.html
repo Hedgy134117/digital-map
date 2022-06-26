@@ -1,50 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>WebSocket demo</title>
-
-    <style>
-        :root {
-            --col-width: 50px;
-            --row-height: 50px;
-        }
-
-        main {
-            display: grid;
-            grid-auto-flow: column;
-            grid-auto-columns: var(--col-width);
-        }
-
-        .el {
-            border: 1px solid black;
-            height: 50px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 
 <body>
-    <main>
-        <!-- <div class="row">
-            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <p draggable="true" ondragstart="drag(event)" id="A">A</p>
-            </div>
-            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-            <div class="el" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-        </div> -->
-    </main>
+    <button>A</button>
 
-    <script src="board.js"></script>
-    <script src="element.js"></script>
     <script>
-        let board = new Board(5, 5);
-        board.generateHTML();
-        let el = new Element(0, 0, "abc");
-        board.addElement(el);
+        let ws = new WebSocket("ws://127.0.0.1:8765/");
+
+        ws.onopen = function (e) {
+            console.log("Working");
+        }
+
+        document.querySelector("button").onclick = () => {
+            ws.send(JSON.stringify({ "message": "a" }));
+        }
+
+        ws.onmessage = function (e) {
+            console.log(`[SERVER] ${e.data}`);
+        }
+
+        ws.onclose = function (e) {
+            console.log(e);
+        }
     </script>
-    <script src="drag.js"></script>
 </body>
 
 </html>
