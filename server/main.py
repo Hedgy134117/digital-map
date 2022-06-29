@@ -29,7 +29,14 @@ async def createServer(admin: WebSocketServerProtocol):
         serverId = round(random.random() * 10000)
     serverId = str(serverId)
     SERVERS.append(
-        {serverId: {"admin": admin, "users": [admin], "names": {admin: str(admin.id)}}}
+        {
+            serverId: {
+                "admin": admin,
+                "users": [admin],
+                "names": {admin: str(admin.id)},
+                "map": {"width": 5, "height": 5, "details": []},
+            }
+        }
     )
     SERVER_IDS.append(serverId)
 
@@ -48,6 +55,17 @@ async def joinServer(serverId: str, user: WebSocketServerProtocol):
     await syncUsers(serverId)
     await syncNames(serverId)
     await syncId(serverId)
+
+
+# Admin actions
+async def updateMapSize(serverId: str, width: int, height: int):
+    server = await getServer(serverId)
+    server["map"]["width"] = width
+    server["map"]["height"] = height
+
+    print(f"[updateMapSize] Server '{serverId}' map size changed to '{width}x{height}'")
+
+    await syncMapSize(serverId)
 
 
 # User actions
@@ -95,6 +113,18 @@ async def syncNames(serverId: str):
     await sendMessageToUsers(server, message)
 
 
+async def syncMapSize(serverId: str):
+    server = await getServer(serverId)
+    width = server["map"]["width"]
+    height = server["map"]["height"]
+    message = json.dumps({"type": "mapSize", "width": width, "height": height})
+
+    print(f"[syncMapSize] Sending map size '{width}x{height}' to server '{serverId}'")
+
+    await sendMessageToUsers(server, message)
+
+
+# Main Server Loop
 async def main(websocket: WebSocketServerProtocol, path):
     USERS.add(websocket)
     async for message in websocket:
@@ -106,6 +136,8 @@ async def main(websocket: WebSocketServerProtocol, path):
             await joinServer(data["serverId"], websocket)
         if data["action"] == "updateName":
             await updateName(data["serverId"], data["name"], websocket)
+        if data["action"] == "updateMapSize":
+            await updateMapSize(data["serverId"], data["width"], data["height"])
 
 
 start_server = websockets.serve(main, "localhost", 8765)

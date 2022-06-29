@@ -7,12 +7,11 @@ ws.onopen = function (e) {
     console.log("Working");
 
     if (isAdmin) {
-        ws.send(JSON.stringify({ "action": "createServer" }));
+        ws.send(JSON.stringify({ action: "createServer" }));
+    } else if (serverId != undefined) {
+        ws.send(JSON.stringify({ action: "joinServer", serverId: serverId }));
     }
-    else if (serverId != undefined) {
-        ws.send(JSON.stringify({ "action": "joinServer", "serverId": serverId }));
-    }
-}
+};
 
 ws.onmessage = function (e) {
     console.log(`[SERVER] ${e.data}`);
@@ -27,12 +26,13 @@ ws.onmessage = function (e) {
             updateNames(data["names"]);
             break;
     }
-}
+};
 
 ws.onclose = function (e) {
-    ws.send(JSON.stringify({ "action": "closeServer" }))
-}
+    ws.send(JSON.stringify({ action: "closeServer" }));
+};
 
+// Sync Server to HTML
 function updateId(id) {
     serverId = id;
     document.querySelector("#id").innerText = id;
@@ -40,13 +40,29 @@ function updateId(id) {
 
 function updateNames(names) {
     let nameList = document.querySelector("#names");
-    nameList.innerHTML = ""
+    nameList.innerHTML = "";
     for (let name of names) {
         nameList.innerHTML += `<li>${name}</li>`;
     }
 }
 
+// Sync HTML to Server
 function updateName() {
     let name = document.querySelector("#name").value;
-    ws.send(JSON.stringify({ "action": "updateName", "serverId": serverId, "name": name }));
+    ws.send(
+        JSON.stringify({ action: "updateName", serverId: serverId, name: name })
+    );
+}
+
+function updateMapSize() {
+    let width = document.querySelector("#width").value;
+    let height = document.querySelector("#height").value;
+    ws.send(
+        JSON.stringify({
+            action: "updateMapSize",
+            serverId: serverId,
+            width: width,
+            height: height,
+        })
+    );
 }
